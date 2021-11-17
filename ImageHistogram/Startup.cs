@@ -31,17 +31,8 @@ namespace ImageHistogram
         {
             services.Configure<PictureDbOptions>(Configuration.GetSection(nameof(PictureDbOptions)));
             services.Configure<HistogramOptions>(Configuration.GetSection(nameof(HistogramOptions)));
-
-            services.AddSingleton<DatabaseInitializer>();
-            services.AddSingleton<ImageStorage>();
-            services.AddSingleton((serviceProvider) => serviceProvider.GetRequiredService<DatabaseInitializer>().Create());
-            services.AddSingleton<FullScanFind>();
-            services.AddSingleton<HistogramCalculator>();
-            services.AddSingleton<IHistogramComparer, KullbackLeiblerDivergence>();
-            services.AddSingleton<IHistogramComparer, MinkowskiDistance>((sp) => new MinkowskiDistance(2));
-            ////services.AddSingleton<IHistogramComparer, Qfd>();
-            services.AddSingleton<SimilarityAggregator>();
-
+            services.Configure<PictureDbOptions>((config) => config.ResavePictures = true);
+            RegisterBusinessServices(services);
             services.AddRazorPages();
 
         }
@@ -71,6 +62,19 @@ namespace ImageHistogram
             {
                 endpoints.MapRazorPages();
             });
+        }
+
+        public static void RegisterBusinessServices(IServiceCollection services)
+        {
+            services.AddSingleton<DatabaseInitializer>();
+            services.AddSingleton<ImageStorage>();
+            services.AddSingleton((serviceProvider) => serviceProvider.GetRequiredService<DatabaseInitializer>().Create());
+            services.AddSingleton<FullScanFind>();
+            services.AddSingleton<HistogramCalculator>();
+            services.AddSingleton<IHistogramComparer, KullbackLeiblerDivergence>();
+            services.AddSingleton<IHistogramComparer, MinkowskiDistance>((sp) => new MinkowskiDistance(2));
+            services.AddSingleton<IHistogramComparer, Qfd>();
+            services.AddSingleton<SimilarityAggregator>();
         }
     }
 }

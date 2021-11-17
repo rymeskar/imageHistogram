@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImageHistogram.Histogram;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -14,15 +15,27 @@ namespace ImageHistogram
             _comparers = comparers ?? throw new ArgumentNullException(nameof(comparers));
         }
 
-        public IEnumerable<SimilarityResponse> Compare(double[] histogram1, double[] histogram2)
+        public IEnumerable<SimilarityResponse> Compare(HistogramsRepresentation histogramsRepresentation1, HistogramsRepresentation histogramsRepresentation2)
         {
-            return _comparers.Select(c => {
+            var hsv = _comparers.Select(c => {
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                var response = c.Compare(histogram1, histogram2);
+                var response = c.Compare(histogramsRepresentation1.HsvHistogram, histogramsRepresentation2.HsvHistogram);
                 response.Duration = stopwatch.Elapsed;
+                response.Name = response.Name + ":HSV";
                 return response;
                 });
+
+            var rgb = _comparers.Select(c => {
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+                var response = c.Compare(histogramsRepresentation1.RgbHistogram, histogramsRepresentation2.RgbHistogram);
+                response.Duration = stopwatch.Elapsed;
+                response.Name = response.Name + ":RGB";
+                return response;
+            });
+
+            return hsv.Concat(rgb);
         }
     }
 }

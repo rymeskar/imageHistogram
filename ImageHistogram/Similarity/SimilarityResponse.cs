@@ -10,7 +10,7 @@ namespace ImageHistogram
             Measure = meaure;
         }
 
-        public string Name { get; }
+        public string Name { get; set; }
         public double Measure { get; }
 
         public TimeSpan Duration { get; set; }

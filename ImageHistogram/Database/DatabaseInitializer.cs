@@ -29,9 +29,12 @@ namespace ImageHistogram
             foreach (var file in Directory.GetFiles(_config.DirectoryPath).Take(_config.ImageCount))
             {
                 var image = Image.Load<Rgba32>(file);
-                var dbItem = new DatabaseItem(histogram.CalculateStandardized(image), histogram.Calculate(image), file, Path.GetFileName(file));
+                var dbItem = new DatabaseItem(histogram.CalculateHistograms(image), file, Path.GetFileName(file));
                 items.Add(dbItem);
-                imageStorage.Store(image, dbItem.FamiliarName);
+                if (_config.ResavePictures)
+                {
+                    imageStorage.Store(image, dbItem.FamiliarName);
+                }
             }
 
             return new ImageDatabase(items);

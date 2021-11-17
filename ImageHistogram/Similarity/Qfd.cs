@@ -17,8 +17,8 @@ namespace ImageHistogram
         }
         public SimilarityResponse Compare(double[] histogram1, double[] histogram2)
         {
-            var hist1 = Matrix<double>.Build.Dense(histogramCalculator.BinCount, 1, histogram1);
-            var hist2 = Matrix<double>.Build.Dense(histogramCalculator.BinCount, 1, histogram1);
+            var hist1 = Matrix<double>.Build.Dense(1, histogramCalculator.BinCount3D, histogram1);
+            var hist2 = Matrix<double>.Build.Dense(1, histogramCalculator.BinCount3D, histogram2);
 
             var diff = hist1 - hist2;
 

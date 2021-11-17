@@ -30,6 +30,7 @@ techniku pro omezení vlivu velikosti obrázku.
 Aplikace obsahuje tyto části:
 * Modul extrakce histogramu (slozka histogram)
   * Lze konfigurovat počet binů. (default je 16)
+  * Počítá se histogram pro HSV a RGB reprezentaci barev.
   * Normalizace probíhá přes dělení celkovým počtem pixelů.
 * Modul podobnostní míra pro porovnání dvojice obrázků, tj. jejich histogramů (slozka similarity)
   * Implementoval jsem tyto typy měr:

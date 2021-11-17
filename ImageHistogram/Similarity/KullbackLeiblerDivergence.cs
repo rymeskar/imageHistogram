@@ -11,7 +11,7 @@ namespace ImageHistogram
             for (var i = 0; i < histogram1.Length; ++i)
             {
                 // TODO: why?
-                if (histogram2[i] ==  0)
+                if (histogram2[i] == 0 || histogram1[i] == 0)
                 {
                     continue;
                 }

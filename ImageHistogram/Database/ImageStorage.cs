@@ -14,6 +14,12 @@ namespace ImageHistogram.Database
         {
             this.env = env;
         }
+
+        public ImageStorage()
+        {
+            // TODO: better
+        }
+
         public string Store(Image<Rgba32> image) => Store(image, Guid.NewGuid().ToString() + ".jpg"); 
 
         public string Store(Image<Rgba32> image, string name)

@@ -19,12 +19,12 @@ namespace ImageHistogram.Evaluation
 
         public  EvaluationResponse FindMostSimilar(Image<Rgba32> image)
         {
-            var histogramArray = histogram.CalculateStandardized(image);
+            var histograms = histogram.CalculateHistograms(image);
 
             var similarityBag = new SimilarityBag();
             foreach (var item in database.Items)
             {
-                var response = similarities.Compare(histogramArray, item.StandardizeHistogram);
+                var response = similarities.Compare(histograms, item.Histograms);
 
                 similarityBag.AddRange(response, item);
             }
