@@ -1,0 +1,31 @@
+﻿@page
+@model UploadFileModel
+@{
+    var imagePath= "";
+    if(Model.UploadedFilePath != null){
+       imagePath = @"images\" + Model.UploadedFilePath;
+   }
+}
+<form method="post" enctype="multipart/form-data">
+    <label>Vybrat data k ohodnocení: <input type="file" asp-for="Upload" /></label>
+    <label>Nahrát: <input type="submit" /></label>
+</form>
+
+    <div style="padding:10px;">
+        @if(imagePath != ""){
+            <div><b>Original Picture</b>: <i>@imagePath</i></div>
+            <img src="@imagePath"  width="300px" />
+        }
+
+    @if(Model.SimilarPictures != null)
+    {
+        @foreach (var item in Model.SimilarPictures.Evaluations)
+        {   <hr />
+            <div><b>Picture Name</b>: <i>@item.Hit.item.FamiliarName</i></div>
+            <div><b>Similarity Name</b>: <i>@item.Hit.response.Name</i></div>
+            <div><b>Similarity Value</b>: <i>@item.Hit.response.Measure</i></div>
+            <div><b>Overall Evaluation Duration</b>: <i>@item.Duration.TotalMilliseconds milliseconds</i></div>
+            <img src="images/@item.Hit.item.FamiliarName"  width="300px" />
+        }
+    }
+</div>
