@@ -8,9 +8,9 @@ namespace ImageHistogram.Evaluation
     {
         private readonly ImageDatabase database;
         private readonly SimilarityAggregator similarities;
-        private readonly Histogram histogram;
+        private readonly HistogramCalculator histogram;
 
-        public FullScanFind(ImageDatabase database, SimilarityAggregator similarities, Histogram histogram)
+        public FullScanFind(ImageDatabase database, SimilarityAggregator similarities, HistogramCalculator histogram)
         {
             this.database = database;
             this.similarities = similarities;

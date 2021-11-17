@@ -7,12 +7,18 @@ namespace ImageHistogram
     {
         private readonly string _name = nameof(Qfd);
 
-        private static readonly Matrix<double> Metric = CalculateMetric();
+        private readonly Matrix<double> Metric;
+        private readonly HistogramCalculator histogramCalculator;
 
+        public Qfd(HistogramCalculator histogramCalculator)
+        {
+            this.histogramCalculator = histogramCalculator;
+            Metric = CalculateMetric();
+        }
         public SimilarityResponse Compare(double[] histogram1, double[] histogram2)
         {
-            var hist1 = Matrix<double>.Build.Dense(Histogram.BinCount, 1, histogram1);
-            var hist2 = Matrix<double>.Build.Dense(Histogram.BinCount, 1, histogram1);
+            var hist1 = Matrix<double>.Build.Dense(histogramCalculator.BinCount, 1, histogram1);
+            var hist2 = Matrix<double>.Build.Dense(histogramCalculator.BinCount, 1, histogram1);
 
             var diff = hist1 - hist2;
 
@@ -27,13 +33,13 @@ namespace ImageHistogram
         /// Source: https://openproceedings.org/2011/conf/edbt/SkopalBL11.pdf
         /// </summary>
         /// <returns></returns>
-        private static Matrix<double> CalculateMetric()
+        private Matrix<double> CalculateMetric()
         {
-            var max = RepDistance(0, Histogram.BinCount3D - 1);
-            var matrix = Matrix<double>.Build.Dense(Histogram.BinCount3D, Histogram.BinCount3D);
-            for (var x = 0; x < Histogram.BinCount3D; ++x)
+            var max = RepDistance(0, histogramCalculator.BinCount3D - 1);
+            var matrix = Matrix<double>.Build.Dense(histogramCalculator.BinCount3D, histogramCalculator.BinCount3D);
+            for (var x = 0; x < histogramCalculator.BinCount3D; ++x)
             {
-                for (var y = 0; y < Histogram.BinCount3D; ++y)
+                for (var y = 0; y < histogramCalculator.BinCount3D; ++y)
                 {
                     matrix.At(x, y, 1 - RepDistance(x, y) / max);
                 }
@@ -42,19 +48,19 @@ namespace ImageHistogram
             return matrix;
         }
 
-        private static double RepDistance(int i, int j)
+        private double RepDistance(int i, int j)
         {
             var total = 0;
             for (var x = 0; x < 2; ++x)
             {
-                var curI = i % Histogram.BinCount;
-                var curJ = j % Histogram.BinCount;
+                var curI = i % histogramCalculator.BinCount;
+                var curJ = j % histogramCalculator.BinCount;
 
                 var dif = curI - curJ;
                 total += dif * dif;
 
-                i = i / Histogram.BinCount;
-                j = j / Histogram.BinCount;
+                i = i / histogramCalculator.BinCount;
+                j = j / histogramCalculator.BinCount;
             }
 
             return Math.Sqrt(total);

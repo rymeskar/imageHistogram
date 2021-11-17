@@ -1,14 +1,24 @@
-﻿using SixLabors.ImageSharp;
+﻿using ImageHistogram.Configuration;
+using Microsoft.Extensions.Options;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace ImageHistogram
 {
-    public class Histogram
+    public class HistogramCalculator
     {
-        public const int BinCount = 16;
-        public static readonly int BinWidth = (1<<8) / BinCount;
-        public static readonly int BinCount3D = BinCount * BinCount * BinCount;
-        public static readonly int BinCount2D = BinCount * BinCount;
+        public int BinCount { get; }
+        public int BinWidth { get; } 
+        public int BinCount3D { get; } 
+        public int BinCount2D { get; }
+        public HistogramCalculator(IOptions<HistogramOptions> options)
+        {
+            BinCount = options.Value.BinCount;
+            BinWidth = (1 << 8) / BinCount;
+            BinCount3D = BinCount * BinCount * BinCount;
+            BinCount2D = BinCount * BinCount;
+        }
+
         public int[] Calculate(Image<Rgba32> image)
         {
             var histogram = new int[BinCount3D];

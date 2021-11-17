@@ -30,12 +30,13 @@ namespace ImageHistogram
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<PictureDbOptions>(Configuration.GetSection(nameof(PictureDbOptions)));
+            services.Configure<HistogramOptions>(Configuration.GetSection(nameof(HistogramOptions)));
 
             services.AddSingleton<DatabaseInitializer>();
             services.AddSingleton<ImageStorage>();
             services.AddSingleton((serviceProvider) => serviceProvider.GetRequiredService<DatabaseInitializer>().Create());
             services.AddSingleton<FullScanFind>();
-            services.AddSingleton<Histogram>();
+            services.AddSingleton<HistogramCalculator>();
             services.AddSingleton<IHistogramComparer, KullbackLeiblerDivergence>();
             services.AddSingleton<IHistogramComparer, MinkowskiDistance>((sp) => new MinkowskiDistance(2));
             ////services.AddSingleton<IHistogramComparer, Qfd>();

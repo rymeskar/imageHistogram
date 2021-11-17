@@ -13,10 +13,10 @@ namespace ImageHistogram
     public class DatabaseInitializer
     {
         private readonly PictureDbOptions _config;
-        private readonly Histogram histogram;
+        private readonly HistogramCalculator histogram;
         private readonly ImageStorage imageStorage;
 
-        public DatabaseInitializer(IOptions<PictureDbOptions> config, Histogram histogram, ImageStorage imageStorage)
+        public DatabaseInitializer(IOptions<PictureDbOptions> config, HistogramCalculator histogram, ImageStorage imageStorage)
         {
             _config = config?.Value ?? throw new ArgumentNullException(nameof(config));
             this.histogram = histogram;
