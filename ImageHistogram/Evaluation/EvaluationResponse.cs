@@ -11,5 +11,7 @@ namespace ImageHistogram.Evaluation
         }
 
         public List<SimilarityMeasureEvaluation> Evaluations { get; }
+
+        public TimeSpan HistogramTime { get; set;  }
     }
 }

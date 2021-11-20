@@ -20,7 +20,7 @@ techniku pro omezení vlivu velikosti obrázku.
 
 ## Způsob řešení
 
-* Aplikace je napsána v C# nad ASP.NET Core a Razor Web Pages. 
+* Výsledná aplikace je napsána v C# nad ASP.NET Core a Razor Web Pages. 
 * Aplikace závisí na dvou balíčcích třetích stran
   * `MathNet.Numerics` pro práci s vektory a maticemi.
   * `SixLabors.ImageSharp` pro práci s obrazky.
@@ -34,13 +34,13 @@ Aplikace obsahuje tyto části:
   * Normalizace probíhá přes dělení celkovým počtem pixelů.
 * Modul podobnostní míra pro porovnání dvojice obrázků, tj. jejich histogramů (slozka similarity)
   * Implementoval jsem tyto typy měr:
-    * KullbackLeiblerDivergence
-	* MinkowskiDistance
-	* Qfd
+    * KullbackLeiblerDivergence dle přednášek.
+	  * MinkowskiDistance dle přednášek.
+	  * Qfd dle [paperu pana Skopala](https://openproceedings.org/2011/conf/edbt/SkopalBL11.pdf).
 * Modul databaze obrazku (slozka database)
   * Aplikace na zacatku nahraje z nakonfigurovane lokace obrazky, spocita jejich histogramy a ulozi do pameti.
 * Modul identifikace podobných databázových obrázků vzhledem ke vstupnímu obrázku (slozka evaluation)
-  * Aplikace seradi podobnosti dotazovaneho obrazku vuci databazi podle ruznych mer a vrati nejlepsiho kandidata vcetne informaci o delce porovnani.
+  * Aplikace seřadí podobnosti dotazovaneho obrazku vuci databazi podle ruznych mer a vrati nejlepsiho kandidata vcetne informaci o delce porovnani.
 * Webový interface (slozka Pages)
   * Jedna stranka, kde se vlozi dotazovany obrazek a vrati se kandidatni obrazky vcetne vizualizace.
 
@@ -48,7 +48,7 @@ Aplikace obsahuje tyto části:
 
 Program běží na adrese `http://imagehistogram.northeurope.azurecontainer.io`. 
 Zde se dá vše vyzkoušet.
-Deploy skript je `containarize.ps1`.
+Deploy skript je `containarize.ps1` (funguje ale jen pro rymeskar, neboť jsou potřeba login credentials..)
 
 Pokud máte zájem o lokální build, pak se musí udělat tři kroky.
 1. Build aplikace
@@ -57,7 +57,12 @@ Pokud máte zájem o lokální build, pak se musí udělat tři kroky.
   * Je možné se podívat na můj sdílený disk (skripty connectShare pro namountování disku do systému)
 3. Spustit aplikaci s namountovanými obrázky ve složce '\images\train'
   * Příklad `docker run -p 1234:80 -v c://Users/karymes/source/repos/ImageHistogram/photos:/images -i image_histogram`
- 
+
+## Zdrojová data
+
+Databázi obrázků jsem získal na [IEEE dataport](https://ieee-dataport.org/open-access/annotated-image-dataset-household-objects-robofeihome-team) hledáním veřejného datasetu. Našel jsem dataset objektů. Ten jsem lehce promázl, ať nemám tisíc obrázku, ale pouze kolem stovky.
+
+V druhé fázi jsem si vybral testovací data, na kterých budu hodnotit přesnost algoritmu. Pro tyto data jsem pokaždé manuálně vybral nejpřesnější objekt z databáze. Tyto informace jsou vidět v projektu `ExperimentRunner`. 
 
 ## Příklad výstupu
 Popis s obrázkem konkrétního vstupu a výstupu aplikace.

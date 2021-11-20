@@ -5,6 +5,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.ColorSpaces.Conversion;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
+using System.Diagnostics;
 
 namespace ImageHistogram
 {
@@ -34,6 +35,8 @@ namespace ImageHistogram
 
         public HistogramsRepresentation CalculateHistograms(Image<Rgba32> image)
         {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             var rgb = CalculateStandardized(image,
                 (pixel) => pixel, 
                 (pixel) => pixel.R / byteBinWidth, 
@@ -45,7 +48,8 @@ namespace ImageHistogram
                 (pixel) => (int)(pixel.S / sBinWidth),
                 (pixel) => (int)(pixel.V / vBinWidth));
 
-            return new HistogramsRepresentation(rgb, hsv);
+            stopwatch.Stop();
+            return new HistogramsRepresentation(rgb, hsv, stopwatch.Elapsed);
         }
 
         private int[] CalculateHistogram<T>(Image<Rgba32> image
@@ -55,16 +59,11 @@ namespace ImageHistogram
             , Func<T, int> third)
         {
             var histogram = new int[BinCount3D];
-            for (var i = 0; i < BinCount3D; i++)
-            {
-                histogram[i] = 0;
-            }
 
-            for (var x = 0; x < image.Width; x++)
+            for (var row = 0; row < image.Height; ++row)
             {
-                for (var y = 0; y < image.Height; y++)
+                foreach (var pixel in image.GetPixelRowSpan(row))
                 {
-                    var pixel = image[x, y];
                     var colorPixel = colorRepresentation(pixel);
                     var r = first(colorPixel);
                     var g = second(colorPixel);
@@ -72,7 +71,7 @@ namespace ImageHistogram
                     histogram[r + BinCount * g + BinCount2D * b]++;
                 }
             }
-
+            
             return histogram;
         }
 
@@ -85,10 +84,10 @@ namespace ImageHistogram
             var intHistogram = CalculateHistogram(image, colorRepresentation, first, second, third);
             var histogram = new double[BinCount3D];
 
-            var total = image.Width * image.Height;
+            double total = image.Width * image.Height;
             for (var i = 0; i < intHistogram.Length; ++i)
             {
-                histogram[i] = intHistogram[i] / (double)total;
+                histogram[i] = intHistogram[i] / total;
             }
 
             return histogram;

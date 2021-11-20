@@ -29,7 +29,10 @@ namespace ImageHistogram.Evaluation
                 similarityBag.AddRange(response, item);
             }
 
-            return similarityBag.EvaluateBest();
+            var retVal = similarityBag.EvaluateBest();
+
+            retVal.HistogramTime = histograms.CalcuationDuration;
+            return retVal;
         }
     }
 }

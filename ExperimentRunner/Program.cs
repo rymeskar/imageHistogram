@@ -29,10 +29,12 @@ namespace ExperimentRunner
             var db = provider.GetRequiredService<ImageDatabase>();
 
             var timeDict = new Dictionary<string, TimeSpan>();
+            var scanningHistogramTimespan = TimeSpan.Zero;
             foreach (var item in db.Items)
             {
                 var image = Image.Load<Rgba32>(item.Path);
                 var scanned = scan.FindMostSimilar(image);
+                scanningHistogramTimespan += scanned.HistogramTime;
                 Console.WriteLine($"Image: {item.FamiliarName},");
 
                 foreach (var evaluation in scanned.Evaluations)
@@ -51,6 +53,9 @@ namespace ExperimentRunner
                 }
             }
 
+            timeDict["InitHistogramTime"] = db.HistogramTime;
+            timeDict["OverallInit"] = db.InitializationTime;
+            timeDict["scanningHisotgrams"] = scanningHistogramTimespan;
             Console.WriteLine("-----------Durations-----");
             Console.WriteLine(JsonConvert.SerializeObject(timeDict));
         }

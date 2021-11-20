@@ -5,6 +5,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -25,7 +26,10 @@ namespace ImageHistogram
 
         public ImageDatabase Create()
         {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
             var items = new List<DatabaseItem>();
+            var histogramTime = TimeSpan.Zero;
             foreach (var file in Directory.GetFiles(_config.DirectoryPath).Take(_config.ImageCount))
             {
                 var image = Image.Load<Rgba32>(file);
@@ -35,9 +39,11 @@ namespace ImageHistogram
                 {
                     imageStorage.Store(image, dbItem.FamiliarName);
                 }
-            }
 
-            return new ImageDatabase(items);
+                histogramTime += dbItem.Histograms.CalcuationDuration;
+            }
+            stopWatch.Stop();
+            return new ImageDatabase(items, stopWatch.Elapsed, histogramTime);
         }
     }
 }
