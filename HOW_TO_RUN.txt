@@ -1,0 +1,2 @@
+Spustitelna verze je na adrese http://imagehistogram.northeurope.azurecontainer.io/
+Nejnovejsi zdrojovy kod pak na adrese https://github.com/rymeskar/imageHistogram

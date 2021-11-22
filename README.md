@@ -28,33 +28,41 @@ techniku pro omezení vlivu velikosti obrázku.
 
 
 Aplikace obsahuje tyto části:
+
 * Modul extrakce histogramu (slozka histogram)
   * Lze konfigurovat počet binů. (default je 16)
   * Počítá se histogram pro HSV a RGB reprezentaci barev.
   * Normalizace probíhá přes dělení celkovým počtem pixelů.
+
 * Modul podobnostní míra pro porovnání dvojice obrázků, tj. jejich histogramů (slozka similarity)
   * Implementoval jsem tyto typy měr:
     * KullbackLeiblerDivergence dle přednášek.
 	  * MinkowskiDistance dle přednášek.
 	  * Qfd dle [paperu pana Skopala](https://openproceedings.org/2011/conf/edbt/SkopalBL11.pdf).
+
 * Modul databaze obrazku (slozka database)
   * Aplikace na zacatku nahraje z nakonfigurovane lokace obrazky, spocita jejich histogramy a ulozi do pameti.
+
 * Modul identifikace podobných databázových obrázků vzhledem ke vstupnímu obrázku (slozka evaluation)
   * Aplikace seřadí podobnosti dotazovaneho obrazku vuci databazi podle ruznych mer a vrati nejlepsiho kandidata vcetne informaci o delce porovnani.
+
 * Webový interface (slozka Pages)
   * Jedna stranka, kde se vlozi dotazovany obrazek a vrati se kandidatni obrazky vcetne vizualizace.
 
 ## Běh programu
 
-Program běží na adrese `http://imagehistogram.northeurope.azurecontainer.io`. 
+Program běží na adrese `http://imagehistogram.northeurope.azurecontainer.io` (kvůli HW nárokům ale s omezenou databází obrázků).
 Zde se dá vše vyzkoušet.
 Deploy skript je `containarize.ps1` (funguje ale jen pro rymeskar, neboť jsou potřeba login credentials..)
 
 Pokud máte zájem o lokální build, pak se musí udělat tři kroky.
+
 1. Build aplikace
   * `docker build -t image_histogram ImageHistogram/.`
+
 2. Zajištění fotografií pro inicializace databáze. 
   * Je možné se podívat na můj sdílený disk (skripty connectShare pro namountování disku do systému)
+
 3. Spustit aplikaci s namountovanými obrázky ve složce '\images\train'
   * Příklad `docker run -p 1234:80 -v c://Users/karymes/source/repos/ImageHistogram/photos:/images -i image_histogram`
   * Docker image ocekava obrazky ve slozce /images/train
@@ -83,7 +91,7 @@ Vyšly mi následující data pro vytvoření databáze histogramu obrázků.
 
 Též jsem experimentálně potvrdil, že identita funguje a pro obrázky z databáze se vždy zvolí ten samý jako nejpodobnější.
 
-Pro přesnost mi vyšly následující počty správně najítých podobných obrázků.
+Pro přesnost mi vyšly následující počty správně najítých podobných obrázků při 16 binech.
 
 ```json
 {
@@ -109,17 +117,30 @@ Metriky pak při výpočtu zabrali následující čas.
 }
 ```
 
-Z výsledku je tedy patrné, že výpočet histogramu obecně zabírá největší část výpočtu. Toto je pochopitelné, neboť se jedná o největší počet operací. 
+Pro úplnost jsem též zvolil nastavení o 8 binech.
+```json
+{
+  "KullbackLeiblerDivergence:RGB": 16,
+  "KullbackLeiblerDivergence:HSV": 17,
+  "MinkowskiDistance2:HSV": 13,
+  "MinkowskiDistance2:RGB": 16,
+  "Qfd:RGB": 12,
+  "Qfd:HSV": 15
+}
+```
 
-Též je patrné, že nejpomalejší měrou je QFD, která při velkém počtu vzorku dokonce trvá déle než samotný výpočet histogramu.
+* Při použití menšího počtu binů je vidět nepatrné zhoršení.
 
-Překvapivě to ale není vynahrezení lepší přesností.
+* Z výsledku je tedy patrné, že výpočet histogramu obecně zabírá největší část výpočtu. Toto je pochopitelné, neboť se jedná o největší počet operací. 
 
-Mezi Minkowski a Kullbeck-Leibler Divergence pak není zásadní rozdíl.
+* Též je patrné, že nejpomalejší měrou je QFD, která při velkém počtu vzorku dokonce trvá déle než samotný výpočet histogramu.
+  * Překvapivě to ale není vynahrezeno lepší přesností.
 
-Obecně mezi  reprezentace barev není vidět rozdílný výsledek.
+* Mezi Minkowski a Kullbeck-Leibler Divergence pak není zásadní rozdíl.
 
-Na přesnost je nepatrným vítězem KullbackLeiblerDivergence.
+* Obecně mezi reprezentacemi barev není vidět rozdílný výsledek.
+
+* Na přesnost je nepatrným vítězem KullbackLeiblerDivergence.
 
 *Tento rozbor výsledků je pouze reprezentativní, pro lepší pochopení chování by měli být provedeny statistické metody rozboru výsledků.*
 
