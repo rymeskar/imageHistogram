@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.ColorSpaces.Conversion;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace ImageHistogram
 {
@@ -23,8 +24,14 @@ namespace ImageHistogram
 
         public HistogramCalculator(IOptions<HistogramOptions> options)
         {
+            var pixelValueCount = 1 << 8;
             BinCount = options.Value.BinCount;
-            byteBinWidth = (1 << 8) / BinCount;
+
+            if (BinCount >= pixelValueCount || pixelValueCount % BinCount != 0)
+            {
+                throw new ArgumentException($"{nameof(BinCount)} must divide {pixelValueCount}");
+            }
+            byteBinWidth = pixelValueCount / BinCount;
             BinCount3D = BinCount * BinCount * BinCount;
             BinCount2D = BinCount * BinCount;
             hBinWidth = 360.00000000001 / BinCount;
@@ -33,23 +40,25 @@ namespace ImageHistogram
             convertor = new ColorSpaceConverter();
         }
 
-        public HistogramsRepresentation CalculateHistograms(Image<Rgba32> image)
+        public async Task<HistogramsRepresentation> CalculateHistogramsAsync(Image<Rgba32> image)
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var rgb = CalculateStandardized(image,
+            var rgbTask = new Task<double[]>(() => CalculateStandardized(image,
                 (pixel) => pixel, 
                 (pixel) => pixel.R / byteBinWidth, 
                 (pixel) => pixel.G / byteBinWidth, 
-                (pixel) => pixel.B / byteBinWidth);
-            var hsv = CalculateStandardized(image,
+                (pixel) => pixel.B / byteBinWidth));
+            var hsvTask = new Task<double[]>(() => CalculateStandardized(image,
                 (pixel) => convertor.ToHsv(pixel),
                 (pixel) => (int)(pixel.H / hBinWidth),
                 (pixel) => (int)(pixel.S / sBinWidth),
-                (pixel) => (int)(pixel.V / vBinWidth));
-
+                (pixel) => (int)(pixel.V / vBinWidth)));
+            rgbTask.Start();
+            hsvTask.Start();
+            await Task.WhenAll(hsvTask, rgbTask);
             stopwatch.Stop();
-            return new HistogramsRepresentation(rgb, hsv, stopwatch.Elapsed);
+            return new HistogramsRepresentation(rgbTask.Result, hsvTask.Result, stopwatch.Elapsed);
         }
 
         private int[] CalculateHistogram<T>(Image<Rgba32> image
@@ -59,6 +68,7 @@ namespace ImageHistogram
             , Func<T, int> third)
         {
             var histogram = new int[BinCount3D];
+
 
             for (var row = 0; row < image.Height; ++row)
             {

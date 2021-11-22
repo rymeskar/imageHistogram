@@ -37,7 +37,7 @@ namespace ImageHistogram
             var image = Image.Load(memoryStream.ToArray());
             UploadedFilePath = imageStorage.Store(image);
 
-            SimilarPictures = dbScan.FindMostSimilar(image);
+            SimilarPictures = await dbScan.FindMostSimilarAsync(image);
         }
     }
 }

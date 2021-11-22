@@ -17,6 +17,8 @@ namespace ImageHistogram
         }
         public SimilarityResponse Compare(double[] histogram1, double[] histogram2)
         {
+            // TODO: number with x digits. Tranform to markdown table
+            //var a = Metric.ToMatrixString(30, 30);
             var hist1 = Matrix<double>.Build.Dense(1, histogramCalculator.BinCount3D, histogram1);
             var hist2 = Matrix<double>.Build.Dense(1, histogramCalculator.BinCount3D, histogram2);
 

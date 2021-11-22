@@ -33,7 +33,7 @@ namespace ImageHistogram
             foreach (var file in Directory.GetFiles(_config.DirectoryPath).Take(_config.ImageCount))
             {
                 var image = Image.Load<Rgba32>(file);
-                var dbItem = new DatabaseItem(histogram.CalculateHistograms(image), file, Path.GetFileName(file));
+                var dbItem = new DatabaseItem(histogram.CalculateHistogramsAsync(image).Result, file, Path.GetFileName(file));
                 items.Add(dbItem);
                 if (_config.ResavePictures)
                 {

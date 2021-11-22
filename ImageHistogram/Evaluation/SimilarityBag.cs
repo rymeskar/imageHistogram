@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,7 +7,7 @@ namespace ImageHistogram.Evaluation
 {
     public class SimilarityBag
     {
-        private readonly Dictionary<string, List<SimilarityHit>> _bag = new Dictionary<string, List<SimilarityHit>>();
+        private readonly ConcurrentDictionary<string, ConcurrentBag<SimilarityHit>> _bag = new ConcurrentDictionary<string, ConcurrentBag<SimilarityHit>>();
 
         public void AddRange(IEnumerable<SimilarityResponse> responses, DatabaseItem item)
         {
@@ -17,11 +18,7 @@ namespace ImageHistogram.Evaluation
         }
         public void Add(SimilarityResponse response, DatabaseItem item)
         {
-            if (!_bag.TryGetValue(response.Name, out var list))
-            {
-                list = new List<SimilarityHit>();
-                _bag[response.Name] = list;
-            }
+            var list = _bag.GetOrAdd(response.Name, (_) => new ConcurrentBag<SimilarityHit>());
             list.Add(new SimilarityHit(response, item));
         }
 
